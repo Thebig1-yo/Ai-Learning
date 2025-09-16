@@ -122,9 +122,9 @@
         const timerDisplay = document.getElementById('timerDisplay');
         const showAnswersButton = document.getElementById('showAnswersButton');
 
-        // IMPORTANT: The API key is handled by the environment and should remain an empty string.
-        const apiKey = "";
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent`;
+        // IMPORTANT: The API key is now set here based on your request.
+        const apiKey = "AIzaSyD-Rdc07BhhYly5C2fz2fIpWtkNnJTWzdI";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
         
         let timerInterval;
         let timeLeft;
