@@ -9,16 +9,19 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* A very light blue-gray background */
         }
         .container {
             max-width: 800px;
         }
         .chat-message.user {
+            background-color: #dbeafe; /* blue-100 */
             border-radius: 1.5rem 1.5rem 0.5rem 1.5rem;
             align-self: flex-end;
             margin-left: auto;
         }
         .chat-message.ai {
+            background-color: #e2e8f0; /* slate-200 */
             border-radius: 1.5rem 1.5rem 1.5rem 0.5rem;
             align-self: flex-start;
         }
@@ -31,12 +34,10 @@
         }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4 sm:p-6 text-gray-800 bg-gray-50 transition-colors duration-500">
+<body class="flex items-center justify-center min-h-screen p-4 sm:p-6 text-gray-800">
 
     <div class="container mx-auto bg-white rounded-3xl shadow-3d p-6 sm:p-10 transition-all duration-500">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-4xl sm:text-5xl font-extrabold text-center text-blue-800 drop-shadow-sm">AI Learning & Quiz</h1>
-        </div>
+        <h1 class="text-4xl sm:text-5xl font-extrabold text-center text-blue-800 mb-2 drop-shadow-sm">AI Learning & Quiz</h1>
         <p class="text-center text-gray-600 mb-10 text-lg">Ready to learn something new? Type a topic and get started!</p>
 
         <!-- Home Page Section -->
@@ -177,8 +178,9 @@
         const chatInput = document.getElementById('chatInput');
         const chatSendButton = document.getElementById('chatSendButton');
         const clearChatButton = document.getElementById('clearChatButton');
-        
-        const apiKey = "AIzaSyD0iha7rSHd6RGsNTyg_8uhfSuJ3pocU3s";
+
+        // IMPORTANT: Paste your API key here to enable API functionality.
+        const apiKey = "AIzaSyB9Ua1nULkrfB25v1rmWqCGJDpamt7jthI";
         const textToTextApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
         const ttsApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
         
@@ -189,14 +191,11 @@
         let currentQuestionIndex = 0;
         let audioContext;
         let chatHistory = [];
-        
 
         // Function to handle retries with exponential backoff for API calls
         async function retryWithExponentialBackoff(callback, args, maxRetries = 5, delay = 1000) {
-            if (!apiKey || apiKey === "AIzaSyB9Ua1nULkrfB25v1rmWqCGJDpamt7jthI") {
-                const errorMsg = "API Key is missing or invalid. Please add your key to the 'apiKey' variable in the code.";
-                console.error(errorMsg);
-                throw new Error(errorMsg);
+            if (apiKey === "AIzaSyD0iha7rSHd6RGsNTyg_8uhfSuJ3pocU3s" || !apiKey) {
+                throw new Error("API Key is missing or invalid. Please provide a valid key.");
             }
             for (let i = 0; i < maxRetries; i++) {
                 try {
@@ -343,7 +342,7 @@
             const totalQuestions = loadedQuizData.quiz.length;
             quizContent.innerHTML = '';
             quizScore.textContent = `You scored ${score} out of ${totalQuestions}!`;
-            quizScore.className = `mt-6 p-4 rounded-lg text-center font-bold text-2xl shadow-md ${score >= totalQuestions / 2 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`;
+            quizScore.className = `mt-6 p-4 rounded-lg text-center font-bold text-xl ${score >= totalQuestions / 2 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`;
             quizScore.classList.remove('hidden');
             quizEndButtons.classList.remove('hidden');
             showAnswersButton.classList.remove('hidden');
