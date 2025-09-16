@@ -801,13 +801,50 @@
                 view.setUint8(offset + i, string.charCodeAt(i));
             }
         }
+
+        // Function to reset all data and UI state
+        function resetApp() {
+            // Reset input fields
+            topicInput.value = '';
+            questionCountInput.value = '10';
+
+            // Reset UI states
+            errorContainer.classList.add('hidden');
+            learningContent.innerHTML = '';
+            quizContent.innerHTML = '';
+            quizScore.classList.add('hidden');
+            quizEndButtons.classList.add('hidden');
+            learningSection.classList.remove('hidden');
+            quizSection.classList.add('hidden');
+            nextButton.classList.add('hidden');
+
+            // Reset data variables
+            loadedQuizData = null;
+            score = 0;
+            currentQuestionIndex = 0;
+            chatHistory = [];
+            chatMessages.innerHTML = '';
+
+            // Clear any running timers
+            clearInterval(timerInterval);
+        }
         
         generateButton.addEventListener('click', generateQuiz);
         startQuizButton.addEventListener('click', startQuiz);
         getMoreInfoButton.addEventListener('click', getMoreInfo);
         getExamplesButton.addEventListener('click', getExamples);
-        backButton.addEventListener('click', () => showPage('homePage'));
-        quizBackButton.addEventListener('click', () => showPage('homePage'));
+        
+        // Updated listeners to reset the app data
+        backButton.addEventListener('click', () => {
+            resetApp();
+            showPage('homePage');
+        });
+        
+        quizBackButton.addEventListener('click', () => {
+            resetApp();
+            showPage('homePage');
+        });
+        
         showAnswersButton.addEventListener('click', showCorrectAnswers);
         nextButton.addEventListener('click', nextQuestion);
         speakButton.addEventListener('click', speakContent);
@@ -816,3 +853,4 @@
     </script>
 </body>
 </html>
+s
