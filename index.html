@@ -171,8 +171,8 @@
         const chatSendButton = document.getElementById('chatSendButton');
         const clearChatButton = document.getElementById('clearChatButton');
 
-        // IMPORTANT: The API key is now set here based on your request.
-        const apiKey = "";
+        // IMPORTANT: Paste your API key here to enable API functionality.
+        const apiKey = "AIzaSyB9Ua1nULkrfB25v1rmWqCGJDpamt7jthI";
         const textToTextApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
         const ttsApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
         
@@ -186,6 +186,9 @@
 
         // Function to handle retries with exponential backoff for API calls
         async function retryWithExponentialBackoff(callback, args, maxRetries = 5, delay = 1000) {
+            if (apiKey === "YOUR_API_KEY_HERE" || !apiKey) {
+                throw new Error("API Key is missing or invalid. Please provide a valid key.");
+            }
             for (let i = 0; i < maxRetries; i++) {
                 try {
                     const response = await callback(...args);
@@ -479,7 +482,7 @@
             } catch (error) {
                 console.error("API call failed:", error);
                 errorContainer.classList.remove('hidden');
-                errorMessage.textContent = `An error occurred: ${error.message}. Please try again.`;
+                errorMessage.textContent = `An error occurred: ${error.message}. Please try again. If the issue persists, ensure your API key is valid.`;
             } finally {
                 loadingIndicator.classList.add('hidden');
                 generateButton.disabled = false;
@@ -617,7 +620,7 @@
                 }
             } catch (error) {
                 console.error("Chat API call failed:", error);
-                appendMessage("Sorry, there was an error communicating with the AI. Please try again.", 'ai');
+                appendMessage("Sorry, there was an error communicating with the AI. Please try again. If the issue persists, ensure your API key is valid.", 'ai');
             } finally {
                 chatSendButton.disabled = false;
             }
@@ -738,7 +741,7 @@
                 }
             } catch (error) {
                 console.error("TTS API call failed:", error);
-                showMessage("Failed to generate speech. Please try again.", true);
+                showMessage("Failed to generate speech. Please try again. If the issue persists, ensure your API key is valid.", true);
                 speakButton.disabled = false;
                 speakButton.textContent = "✨ Speak Content";
             }
