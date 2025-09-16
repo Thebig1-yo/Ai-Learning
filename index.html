@@ -161,6 +161,7 @@
             const options = questionElement.querySelectorAll('.quiz-option');
             const data = JSON.parse(questionElement.dataset.question);
             const correctAnswer = data.correctAnswer;
+            const explanation = data.correctAnswerExplanation;
             
             // Check if a selection has already been made
             if (questionElement.dataset.answered) {
@@ -189,6 +190,12 @@
                 showMessage("Incorrect. The correct answer is highlighted.", true);
             }
 
+            // Display the explanation
+            const explanationDiv = document.createElement('div');
+            explanationDiv.className = 'mt-4 p-4 rounded-lg border-l-4 border-blue-500 bg-blue-50';
+            explanationDiv.innerHTML = `<p class="font-bold text-blue-800">Explanation:</p><p class="mt-1 text-gray-700">${explanation}</p>`;
+            questionElement.appendChild(explanationDiv);
+
             // Move to the next question after a short delay
             setTimeout(() => {
                 currentQuestionIndex++;
@@ -197,7 +204,7 @@
                 } else {
                     endQuiz();
                 }
-            }, 1000);
+            }, 3000);
         }
         
         // Function to start the timer for the current question
@@ -273,11 +280,22 @@
                     `;
                 });
 
+                // Add the explanation block below the question
+                const explanationBlock = `
+                    <div class="mt-4 p-4 rounded-lg border-l-4 border-blue-500 bg-blue-50">
+                        <p class="font-bold text-blue-800">Correct Answer:</p>
+                        <p class="text-gray-700">${question.correctAnswer}</p>
+                        <p class="font-bold text-blue-800 mt-2">Explanation:</p>
+                        <p class="text-gray-700">${question.correctAnswerExplanation}</p>
+                    </div>
+                `;
+
                 qDiv.innerHTML = `
                     <p class="text-lg font-medium mb-4">${index + 1}. ${question.question}</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         ${optionsHtml}
                     </div>
+                    ${explanationBlock}
                 `;
                 quizContent.appendChild(qDiv);
             });
@@ -409,6 +427,7 @@
             loadingIndicator.classList.remove('hidden');
             generateButton.disabled = true;
 
+            // Prompt updated to request an explanation for the correct answer
             const prompt = `Based on the topic "${topic}", provide a detailed explanation and a multiple-choice quiz. The explanation should be a single paragraph. The quiz must have exactly ${questionCount} questions, with each question having 4 options. The response MUST be a single JSON object with the following structure:
             
             {
@@ -417,12 +436,8 @@
                     {
                         "question": "Question 1 text here?",
                         "options": ["Option A", "Option B", "Option C", "Option D"],
-                        "correctAnswer": "Correct option text here"
-                    },
-                    {
-                        "question": "Question 2 text here?",
-                        "options": ["Option A", "Option B", "Option C", "Option D"],
-                        "correctAnswer": "Correct option text here"
+                        "correctAnswer": "Correct option text here",
+                        "correctAnswerExplanation": "A short, one-sentence explanation for the correct answer."
                     }
                 ]
             }
@@ -447,9 +462,10 @@
                                             "type": "ARRAY",
                                             "items": { "type": "STRING" }
                                         },
-                                        "correctAnswer": { "type": "STRING" }
+                                        "correctAnswer": { "type": "STRING" },
+                                        "correctAnswerExplanation": { "type": "STRING" }
                                     },
-                                    "propertyOrdering": ["question", "options", "correctAnswer"]
+                                    "propertyOrdering": ["question", "options", "correctAnswer", "correctAnswerExplanation"]
                                 }
                             }
                         },
