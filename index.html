@@ -29,134 +29,84 @@
                 0 1px 3px rgba(0, 0, 0, 0.08), 
                 0 10px 20px rgba(0, 0, 0, 0.15);
         }
-        
-        /* Dark mode styles */
-        .dark body {
-            background-color: #1e293b; /* slate-800 */
-            color: #e2e8f0; /* slate-200 */
-        }
-        .dark .container {
-            background-color: #1f2937; /* gray-800 */
-        }
-        .dark .chat-message.user {
-            background-color: #1e40af; /* blue-800 */
-            color: #dbeafe; /* blue-100 */
-        }
-        .dark .chat-message.ai {
-            background-color: #334155; /* slate-700 */
-            color: #e2e8f0; /* slate-200 */
-        }
-        .dark #learningContent {
-            background-color: #334155; /* slate-700 */
-            border-color: #475569; /* slate-600 */
-            color: #e2e8f0;
-        }
-        .dark #chatSection {
-            background-color: #334155;
-            border-color: #475569;
-        }
-        .dark .dark-input {
-            background-color: #374151; /* gray-700 */
-            border-color: #4b5563; /* gray-600 */
-            color: #f9fafb; /* gray-50 */
-        }
-        .dark .dark-text-blue {
-            color: #93c5fd; /* blue-300 */
-        }
-        .dark .dark-text-gray {
-            color: #94a3b8; /* slate-400 */
-        }
-        .dark .dark-border-blue {
-            border-color: #60a5fa; /* blue-400 */
-        }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4 sm:p-6 text-gray-800 bg-gray-50 dark:bg-gray-900 dark:text-gray-200 transition-colors duration-500">
+<body class="flex items-center justify-center min-h-screen p-4 sm:p-6 text-gray-800 bg-gray-50 transition-colors duration-500">
 
-    <div class="container mx-auto bg-white rounded-3xl shadow-3d p-6 sm:p-10 transition-all duration-500 dark:bg-gray-800">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-4xl sm:text-5xl font-extrabold text-center text-blue-800 drop-shadow-sm dark:text-blue-300">AI Learning & Quiz</h1>
-            <button id="themeToggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 transition-colors duration-300">
-                 <!-- Sun Icon -->
-                <svg id="sun-icon" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-                <!-- Moon Icon (hidden by default) -->
-                <svg id="moon-icon" class="h-6 w-6 hidden" fill="currentColor" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                </svg>
-            </button>
+    <div class="container mx-auto bg-white rounded-3xl shadow-3d p-6 sm:p-10 transition-all duration-500">
+        <div class="flex justify-center items-center mb-6">
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-center text-blue-800 drop-shadow-sm">AI Learning & Quiz</h1>
         </div>
-        <p class="text-center text-gray-600 mb-10 text-lg dark:text-gray-400">Ready to learn something new? Type a topic and get started!</p>
+        <p class="text-center text-gray-600 mb-10 text-lg">Ready to learn something new? Type a topic and get started!</p>
 
         <!-- Home Page Section -->
         <div id="homePage" class="transition-opacity duration-700 flex flex-col items-stretch">
             <div class="flex flex-col sm:flex-row gap-6 mb-8">
                 <textarea id="topicInput" rows="3" placeholder="e.g., The water cycle, Ancient Greek history, Simple machine principles..."
-                          class="flex-grow p-4 border-2 border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-400 transition-all duration-300 resize-none text-lg dark:bg-gray-700 dark:text-gray-50 dark:border-gray-600 dark:focus:ring-blue-400"></textarea>
+                          class="flex-grow p-4 border-2 border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-400 transition-all duration-300 resize-none text-lg"></textarea>
                 <div class="flex flex-col gap-4 w-full sm:w-1/3">
-                    <input type="number" id="questionCountInput" value="10" min="1" max="20" placeholder="Number of questions" class="p-4 border-2 border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-400 transition-all duration-300 text-center text-lg w-full dark:bg-gray-700 dark:text-gray-50 dark:border-gray-600 dark:focus:ring-blue-400">
+                    <input type="number" id="questionCountInput" value="10" min="1" max="20" placeholder="Number of questions" class="p-4 border-2 border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-400 transition-all duration-300 text-center text-lg w-full">
                     <button id="generateButton"
-                            class="bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold py-4 px-8 rounded-2xl shadow-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-400 disabled:from-gray-400 disabled:to-gray-500 disabled:shadow-none disabled:transform-none dark:from-blue-700 dark:to-blue-800 dark:hover:from-blue-800 dark:hover:to-blue-900">
+                            class="bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold py-4 px-8 rounded-2xl shadow-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-400 disabled:from-gray-400 disabled:to-gray-500 disabled:shadow-none disabled:transform-none">
                         Generate Quiz
                     </button>
                 </div>
             </div>
             
             <div id="loadingIndicator" class="hidden text-center mt-8">
-                <div class="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-current border-r-transparent text-blue-600 dark:text-blue-400" role="status">
+                <div class="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-current border-r-transparent text-blue-600" role="status">
                     <span class="!absolute !-m-px !h-px !-w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">Loading...</span>
                 </div>
-                <p class="mt-4 text-gray-500 text-lg dark:text-gray-400">Generating your content...</p>
+                <p class="mt-4 text-gray-500 text-lg">Generating your content...</p>
             </div>
     
-            <div id="errorContainer" class="hidden mt-8 bg-red-100 p-6 rounded-2xl text-red-700 border border-red-300 shadow-md transition-opacity duration-300 dark:bg-red-900 dark:text-red-300 dark:border-red-600">
+            <div id="errorContainer" class="hidden mt-8 bg-red-100 p-6 rounded-2xl text-red-700 border border-red-300 shadow-md transition-opacity duration-300">
                 <p id="errorMessage" class="font-semibold"></p>
             </div>
         </div>
 
         <!-- Learning & Quiz Page Section -->
         <div id="learningAndQuizPage" class="hidden transition-opacity duration-700">
-            <button id="backButton" class="mb-6 text-blue-600 hover:text-blue-800 font-semibold transition-all duration-300 transform hover:-translate-x-1 dark:text-blue-400 dark:hover:text-blue-600">
+            <button id="backButton" class="mb-6 text-blue-600 hover:text-blue-800 font-semibold transition-all duration-300 transform hover:-translate-x-1">
                 &larr; Back to Home
             </button>
             
             <div id="resultContainer" class="mt-4">
                 <!-- Learning Content Section -->
                 <div id="learningSection" class="transition-all duration-500">
-                    <div id="learningContent" class="bg-blue-50 p-8 rounded-3xl border border-blue-200 mb-8 shadow-inner text-lg dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
+                    <div id="learningContent" class="bg-blue-50 p-8 rounded-3xl border border-blue-200 mb-8 shadow-inner text-lg">
                         <!-- Learning content will be displayed here -->
                     </div>
                     <div class="flex flex-col sm:flex-row gap-4 mb-8">
-                        <button id="getMoreInfoButton" class="flex-grow bg-blue-500 text-white font-semibold py-4 rounded-2xl shadow-md hover:bg-blue-600 transition-colors duration-300 disabled:bg-gray-400 dark:bg-blue-600 dark:hover:bg-blue-700 dark:disabled:bg-gray-700">
+                        <button id="getMoreInfoButton" class="flex-grow bg-blue-500 text-white font-semibold py-4 rounded-2xl shadow-md hover:bg-blue-600 transition-colors duration-300 disabled:bg-gray-400">
                             Explain it more simply
                         </button>
-                        <button id="getExamplesButton" class="flex-grow bg-blue-500 text-white font-semibold py-4 rounded-2xl shadow-md hover:bg-blue-600 transition-colors duration-300 disabled:bg-gray-400 dark:bg-blue-600 dark:hover:bg-blue-700 dark:disabled:bg-gray-700">
+                        <button id="getExamplesButton" class="flex-grow bg-blue-500 text-white font-semibold py-4 rounded-2xl shadow-md hover:bg-blue-600 transition-colors duration-300 disabled:bg-gray-400">
                             Give me examples
                         </button>
-                        <button id="speakButton" class="flex-grow bg-purple-500 text-white font-semibold py-4 rounded-2xl shadow-md hover:bg-purple-600 transition-colors duration-300 disabled:bg-gray-400 dark:bg-purple-600 dark:hover:bg-purple-700 dark:disabled:bg-gray-700">
+                        <button id="speakButton" class="flex-grow bg-purple-500 text-white font-semibold py-4 rounded-2xl shadow-md hover:bg-purple-600 transition-colors duration-300 disabled:bg-gray-400">
                             ✨ Speak Content
                         </button>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-4">
-                         <button id="startQuizButton" class="flex-grow bg-blue-600 text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-blue-700 transition-colors duration-300 disabled:bg-gray-400 dark:bg-blue-700 dark:hover:bg-blue-800 dark:disabled:bg-gray-700">
+                         <button id="startQuizButton" class="flex-grow bg-blue-600 text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-blue-700 transition-colors duration-300 disabled:bg-gray-400">
                             Start Quiz
                         </button>
                     </div>
                     
                     <!-- Chat Section -->
-                    <div id="chatSection" class="mt-12 bg-gray-50 p-8 rounded-3xl border border-gray-200 shadow-inner dark:bg-gray-700 dark:border-gray-600">
-                        <h3 class="text-2xl font-bold mb-6 text-center text-blue-800 dark:text-blue-300">Ask the AI Tutor</h3>
+                    <div id="chatSection" class="mt-12 bg-gray-50 p-8 rounded-3xl border border-gray-200 shadow-inner">
+                        <h3 class="text-2xl font-bold mb-6 text-center text-blue-800">Ask the AI Tutor</h3>
                         <div id="chatMessages" class="flex flex-col gap-4 overflow-y-auto max-h-72 mb-4 p-2">
                             <!-- Chat messages will appear here -->
                         </div>
                         <form id="chatForm" class="flex flex-col sm:flex-row gap-2">
                             <input type="text" id="chatInput" placeholder="Ask a question..."
-                                class="flex-grow p-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors dark:bg-gray-800 dark:text-gray-50 dark:border-gray-600 dark:focus:ring-blue-400">
-                            <button type="submit" id="chatSendButton" class="bg-blue-600 text-white py-3 px-6 rounded-xl shadow-md hover:bg-blue-700 transition-colors disabled:bg-gray-400 dark:bg-blue-700 dark:hover:bg-blue-800 dark:disabled:bg-gray-700">
+                                class="flex-grow p-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+                            <button type="submit" id="chatSendButton" class="bg-blue-600 text-white py-3 px-6 rounded-xl shadow-md hover:bg-blue-700 transition-colors disabled:bg-gray-400">
                                 Send ✨
                             </button>
-                            <button type="button" id="clearChatButton" class="bg-red-500 text-white py-3 px-6 rounded-xl shadow-md hover:bg-red-600 transition-colors dark:bg-red-700 dark:hover:bg-red-800">
+                            <button type="button" id="clearChatButton" class="bg-red-500 text-white py-3 px-6 rounded-xl shadow-md hover:bg-red-600 transition-colors">
                                 Clear
                             </button>
                         </form>
@@ -166,23 +116,23 @@
                 <!-- Quiz Section (initially hidden) -->
                 <div id="quizSection" class="hidden transition-all duration-500">
                     <div class="flex flex-col sm:flex-row items-center justify-between mb-6">
-                        <h2 class="text-3xl font-bold mb-2 sm:mb-0 text-blue-800 dark:text-blue-300">Quiz Time!</h2>
-                        <div id="timerDisplay" class="text-xl font-semibold text-red-600 bg-red-100 px-6 py-2 rounded-full border-2 border-red-300 shadow-sm w-full sm:w-auto text-center sm:text-right dark:bg-red-900 dark:text-red-300 dark:border-red-600">
+                        <h2 class="text-3xl font-bold mb-2 sm:mb-0 text-blue-800">Quiz Time!</h2>
+                        <div id="timerDisplay" class="text-xl font-semibold text-red-600 bg-red-100 px-6 py-2 rounded-full border-2 border-red-300 shadow-sm w-full sm:w-auto text-center sm:text-right">
                             2:00
                         </div>
                     </div>
                     <div id="quizContent" class="space-y-6">
                         <!-- Quiz questions will be displayed here -->
                     </div>
-                    <button id="nextButton" class="hidden w-full bg-blue-600 text-white font-bold py-4 px-6 rounded-2xl shadow-lg hover:bg-blue-700 transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 mt-8 dark:bg-blue-700 dark:hover:bg-blue-800">
+                    <button id="nextButton" class="hidden w-full bg-blue-600 text-white font-bold py-4 px-6 rounded-2xl shadow-lg hover:bg-blue-700 transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 mt-8">
                         Next Question &rarr;
                     </button>
-                    <div id="quizScore" class="hidden mt-8 p-6 rounded-2xl text-center font-bold text-2xl shadow-md dark:bg-gray-700"></div>
+                    <div id="quizScore" class="hidden mt-8 p-6 rounded-2xl text-center font-bold text-2xl shadow-md"></div>
                     <div id="quizEndButtons" class="hidden flex flex-col sm:flex-row justify-center gap-4 mt-8">
-                        <button id="showAnswersButton" class="bg-blue-500 text-white font-semibold py-3 px-6 rounded-2xl shadow-md hover:bg-blue-600 transition-colors dark:bg-blue-600 dark:hover:bg-blue-700">
+                        <button id="showAnswersButton" class="bg-blue-500 text-white font-semibold py-3 px-6 rounded-2xl shadow-md hover:bg-blue-600 transition-colors">
                             Show Correct Answers
                         </button>
-                        <button id="quizBackButton" class="bg-gray-300 text-gray-800 font-semibold py-3 px-6 rounded-2xl shadow-md hover:bg-gray-400 transition-colors dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">
+                        <button id="quizBackButton" class="bg-gray-300 text-gray-800 font-semibold py-3 px-6 rounded-2xl shadow-md hover:bg-gray-400 transition-colors">
                             Back to Home
                         </button>
                     </div>
@@ -227,12 +177,8 @@
         const chatInput = document.getElementById('chatInput');
         const chatSendButton = document.getElementById('chatSendButton');
         const clearChatButton = document.getElementById('clearChatButton');
-        const themeToggle = document.getElementById('themeToggle');
-        const sunIcon = document.getElementById('sun-icon');
-        const moonIcon = document.getElementById('moon-icon');
         
-        // IMPORTANT: Paste your API key here to enable API functionality.
-        const apiKey = "AIzaSyB9Ua1nULkrfB25v1rmWqCGJDpamt7jthI";
+        const apiKey = "AIzaSyD0iha7rSHd6RGsNTyg_8uhfSuJ3pocU3s";
         const textToTextApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
         const ttsApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
         
@@ -243,38 +189,14 @@
         let currentQuestionIndex = 0;
         let audioContext;
         let chatHistory = [];
-
-        // --- Theme Toggle Functionality ---
-        function toggleTheme() {
-            // This logs a message to the browser console.
-            // You can open the console (right-click -> Inspect -> Console) to see it.
-            console.log("Toggling theme...");
-            const isDark = document.body.classList.toggle('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            sunIcon.classList.toggle('hidden', isDark);
-            moonIcon.classList.toggle('hidden', !isDark);
-        }
-
-        function applyInitialTheme() {
-            const savedTheme = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
-            if (isDark) {
-                document.body.classList.add('dark');
-            }
-            sunIcon.classList.toggle('hidden', isDark);
-            moonIcon.classList.toggle('hidden', !isDark);
-        }
         
-        applyInitialTheme();
-        themeToggle.addEventListener('click', toggleTheme);
-        // --- End of Theme Toggle Functionality ---
 
         // Function to handle retries with exponential backoff for API calls
         async function retryWithExponentialBackoff(callback, args, maxRetries = 5, delay = 1000) {
-            if (!apiKey) {
-                console.error("API Key is missing. Please add your key to the 'apiKey' variable in the code.");
-                throw new Error("API Key is missing or invalid. Please provide a valid key.");
+            if (!apiKey || apiKey === "AIzaSyD0iha7rSHd6RGsNTyg_8uhfSuJ3pocU3s") {
+                const errorMsg = "API Key is missing or invalid. Please add your key to the 'apiKey' variable in the code.";
+                console.error(errorMsg);
+                throw new Error(errorMsg);
             }
             for (let i = 0; i < maxRetries; i++) {
                 try {
@@ -344,10 +266,10 @@
                 option.disabled = true;
                 if (option.textContent === correctAnswer) {
                     option.classList.remove('hover:bg-gray-200', 'border-gray-300', 'text-gray-700');
-                    option.classList.add('bg-green-100', 'border-green-500', 'text-green-800', 'font-bold', 'dark:bg-green-800', 'dark:text-green-200', 'dark:border-green-600');
+                    option.classList.add('bg-green-100', 'border-green-500', 'text-green-800', 'font-bold');
                 } else if (option.textContent === selectedOption) {
                     option.classList.remove('hover:bg-gray-200', 'border-gray-300');
-                    option.classList.add('bg-red-100', 'border-red-500', 'text-red-800', 'dark:bg-red-800', 'dark:text-red-200', 'dark:border-red-600');
+                    option.classList.add('bg-red-100', 'border-red-500', 'text-red-800');
                 }
             });
 
@@ -360,8 +282,8 @@
 
             // Display the explanation
             const explanationDiv = document.createElement('div');
-            explanationDiv.className = 'mt-4 p-4 rounded-lg border-l-4 border-blue-500 bg-blue-50 dark:bg-gray-700 dark:border-blue-300';
-            explanationDiv.innerHTML = `<p class="font-bold text-blue-800 dark:text-blue-300">Explanation:</p><p class="mt-1 text-gray-700 dark:text-gray-300">${explanation}</p>`;
+            explanationDiv.className = 'mt-4 p-4 rounded-lg border-l-4 border-blue-500 bg-blue-50';
+            explanationDiv.innerHTML = `<p class="font-bold text-blue-800">Explanation:</p><p class="mt-1 text-gray-700">${explanation}</p>`;
             questionElement.appendChild(explanationDiv);
 
             // Change button text for the final question
@@ -421,7 +343,7 @@
             const totalQuestions = loadedQuizData.quiz.length;
             quizContent.innerHTML = '';
             quizScore.textContent = `You scored ${score} out of ${totalQuestions}!`;
-            quizScore.className = `mt-6 p-4 rounded-lg text-center font-bold text-2xl shadow-md ${score >= totalQuestions / 2 ? 'bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-200' : 'bg-red-100 text-red-700 dark:bg-red-800 dark:text-red-200'}`;
+            quizScore.className = `mt-6 p-4 rounded-lg text-center font-bold text-2xl shadow-md ${score >= totalQuestions / 2 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`;
             quizScore.classList.remove('hidden');
             quizEndButtons.classList.remove('hidden');
             showAnswersButton.classList.remove('hidden');
@@ -435,14 +357,14 @@
 
             loadedQuizData.quiz.forEach((question, index) => {
                 const qDiv = document.createElement('div');
-                qDiv.className = 'bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200 dark:bg-gray-700 dark:border-gray-600';
+                qDiv.className = 'bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200';
                 
                 let optionsHtml = '';
                 question.options.forEach(option => {
                     const isCorrect = option === question.correctAnswer;
                     const optionClasses = isCorrect
-                        ? 'bg-green-100 border-green-500 text-green-800 font-bold dark:bg-green-800 dark:text-green-200 dark:border-green-600'
-                        : 'bg-gray-100 border-gray-300 text-gray-700 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300';
+                        ? 'bg-green-100 border-green-500 text-green-800 font-bold'
+                        : 'bg-gray-100 border-gray-300 text-gray-700';
 
                     optionsHtml += `
                         <button class="w-full text-left p-3 border rounded-lg cursor-default ${optionClasses}" disabled>
@@ -453,16 +375,16 @@
 
                 // Add the explanation block below the question
                 const explanationBlock = `
-                    <div class="mt-4 p-4 rounded-lg border-l-4 border-blue-500 bg-blue-50 dark:bg-gray-800 dark:border-blue-400">
-                        <p class="font-bold text-blue-800 dark:text-blue-300">Correct Answer:</p>
-                        <p class="text-gray-700 dark:text-gray-300">${question.correctAnswer}</p>
-                        <p class="font-bold text-blue-800 mt-2 dark:text-blue-300">Explanation:</p>
-                        <p class="text-gray-700 dark:text-gray-300">${question.correctAnswerExplanation}</p>
+                    <div class="mt-4 p-4 rounded-lg border-l-4 border-blue-500 bg-blue-50">
+                        <p class="font-bold text-blue-800">Correct Answer:</p>
+                        <p class="text-gray-700">${question.correctAnswer}</p>
+                        <p class="font-bold text-blue-800 mt-2">Explanation:</p>
+                        <p class="text-gray-700">${question.correctAnswerExplanation}</p>
                     </div>
                 `;
 
                 qDiv.innerHTML = `
-                    <p class="text-lg font-medium mb-4 dark:text-gray-100">${index + 1}. ${question.question}</p>
+                    <p class="text-lg font-medium mb-4">${index + 1}. ${question.question}</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         ${optionsHtml}
                     </div>
@@ -475,7 +397,7 @@
 
         // Function to render the learning content
         function renderLearningContent(data) {
-            learningContent.innerHTML = `<h2 class="text-2xl font-bold mb-4 dark:text-blue-300">Learning Summary</h2><p class="text-gray-700 dark:text-gray-300">${data.explanation}</p>`;
+            learningContent.innerHTML = `<h2 class="text-2xl font-bold mb-4">Learning Summary</h2><p class="text-gray-700">${data.explanation}</p>`;
             startQuizButton.disabled = false;
         }
 
@@ -612,7 +534,7 @@
                 
                 if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
                     const newExplanation = result.candidates[0].content.parts[0].text;
-                    learningContent.innerHTML = `<h2 class="text-2xl font-bold mb-4 dark:text-blue-300">Detailed Explanation</h2><p class="text-gray-700 dark:text-gray-300">${newExplanation}</p>`;
+                    learningContent.innerHTML = `<h2 class="text-2xl font-bold mb-4">Detailed Explanation</h2><p class="text-gray-700">${newExplanation}</p>`;
                     showMessage("Explanation updated!", false);
                 } else {
                     throw new Error("Invalid or empty response from the AI.");
@@ -658,7 +580,7 @@
                 
                 if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
                     const examples = result.candidates[0].content.parts[0].text;
-                    learningContent.innerHTML = `<h2 class="text-2xl font-bold mb-4 dark:text-blue-300">Examples</h2><p class="text-gray-700 dark:text-gray-300">${examples}</p>`;
+                    learningContent.innerHTML = `<h2 class="text-2xl font-bold mb-4">Examples</h2><p class="text-gray-700">${examples}</p>`;
                     showMessage("Examples loaded!", false);
                 } else {
                     throw new Error("Invalid or empty response from the AI.");
@@ -747,12 +669,12 @@
             const qDiv = document.createElement('div');
             qDiv.id = `question-${index}`;
             qDiv.dataset.question = JSON.stringify(question);
-            qDiv.className = 'bg-gray-50 p-6 rounded-2xl shadow-sm border border-gray-200 dark:bg-gray-700 dark:border-gray-600';
+            qDiv.className = 'bg-gray-50 p-6 rounded-2xl shadow-sm border border-gray-200';
             
             let optionsHtml = '';
             question.options.forEach(option => {
                 optionsHtml += `
-                    <button class="quiz-option w-full text-left p-4 border-2 border-gray-300 rounded-xl transition-all duration-200 hover:bg-gray-200 hover:shadow-md text-gray-700 font-medium dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" 
+                    <button class="quiz-option w-full text-left p-4 border-2 border-gray-300 rounded-xl transition-all duration-200 hover:bg-gray-200 hover:shadow-md text-gray-700 font-medium" 
                             onclick="checkAnswer(${index}, '${option}')">
                         ${option}
                     </button>
@@ -760,7 +682,7 @@
             });
 
             qDiv.innerHTML = `
-                <p class="text-xl font-medium mb-5 dark:text-gray-100">${index + 1}. ${question.question}</p>
+                <p class="text-xl font-medium mb-5">${index + 1}. ${question.question}</p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     ${optionsHtml}
                 </div>
