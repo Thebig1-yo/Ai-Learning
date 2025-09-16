@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Learning and Quiz App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .container {
+            max-width: 800px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 flex items-center justify-center min-h-screen p-4 sm:p-6">
+
+    <div class="container mx-auto bg-white rounded-xl shadow-2xl p-6 sm:p-8 transition-all duration-300">
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-center text-blue-800 mb-2">AI Learning & Quiz</h1>
+        <p class="text-center text-gray-600 mb-8">Type a topic and your desired number of questions below.</p>
+
+        <!-- Home Page Section -->
+        <div id="homePage" class="transition-opacity duration-500 flex flex-col items-stretch">
+            <div class="flex flex-col sm:flex-row gap-4 mb-8">
+                <textarea id="topicInput" rows="3" placeholder="e.g., The basics of photosynthesis, History of the Roman Empire, Principles of blockchain technology..."
+                          class="flex-grow p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors resize-none"></textarea>
+                <div class="flex flex-col gap-4 w-full sm:w-1/3">
+                    <input type="number" id="questionCountInput" value="10" min="1" max="20" placeholder="Number of questions" class="p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors text-center w-full">
+                    <button id="generateButton"
+                            class="bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 transition-colors whitespace-nowrap disabled:bg-gray-400">
+                        Generate Quiz
+                    </button>
+                </div>
+            </div>
+            
+            <div id="loadingIndicator" class="hidden text-center mt-8">
+                <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent text-blue-600" role="status">
+                    <span class="!absolute !-m-px !h-px !-w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">Loading...</span>
+                </div>
+                <p class="mt-2 text-gray-500">Generating your content...</p>
+            </div>
+    
+            <div id="errorContainer" class="hidden mt-8 bg-red-100 p-4 rounded-lg text-red-700 border border-red-300">
+                <p id="errorMessage"></p>
+            </div>
+        </div>
+
+        <!-- Learning & Quiz Page Section -->
+        <div id="learningAndQuizPage" class="hidden transition-opacity duration-500">
+            <button id="backButton" class="mb-4 text-blue-600 hover:text-blue-800 font-semibold transition-colors">
+                &larr; Back to Home
+            </button>
+            
+            <div id="resultContainer" class="mt-4">
+                <!-- Learning Content Section -->
+                <div id="learningSection" class="transition-all duration-500">
+                    <div id="learningContent" class="bg-blue-50 p-6 rounded-lg border border-blue-200 mb-6">
+                        <!-- Learning content will be displayed here -->
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button id="getMoreInfoButton" class="flex-grow bg-blue-500 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-blue-600 transition-colors disabled:bg-gray-400">
+                            Explain it more simply
+                        </button>
+                        <button id="startQuizButton" class="flex-grow bg-blue-600 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-blue-700 transition-colors disabled:bg-gray-400">
+                            Start Quiz
+                        </button>
+                    </div>
+                </div>
+    
+                <!-- Quiz Section (initially hidden) -->
+                <div id="quizSection" class="hidden transition-all duration-500">
+                    <div class="flex flex-col sm:flex-row items-center justify-between mb-4">
+                        <h2 class="text-2xl font-bold mb-2 sm:mb-0">Quiz Time!</h2>
+                        <div id="timerDisplay" class="text-lg font-semibold text-red-600 bg-red-100 px-4 py-2 rounded-full border border-red-300 w-full sm:w-auto text-center sm:text-right">
+                            2:00
+                        </div>
+                    </div>
+                    <div id="quizContent" class="space-y-6">
+                        <!-- Quiz questions will be displayed here -->
+                    </div>
+                    <div id="quizScore" class="hidden mt-6 p-4 rounded-lg text-center font-bold text-xl"></div>
+                    <div id="quizEndButtons" class="hidden flex flex-col sm:flex-row justify-center gap-4 mt-6">
+                        <button id="showAnswersButton" class="bg-blue-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-blue-600 transition-colors">
+                            Show Correct Answers
+                        </button>
+                        <button id="quizBackButton" class="bg-gray-300 text-gray-800 font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-gray-400 transition-colors">
+                            Back to Home
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="messageBox" class="fixed inset-x-0 bottom-4 w-fit mx-auto text-white text-center py-3 px-6 rounded-full shadow-lg transform transition-all duration-300 -translate-y-2 opacity-0 pointer-events-none">
+            <!-- Message box for user feedback -->
+        </div>
+    </div>
+
+    <script>
+        const topicInput = document.getElementById('topicInput');
+        const questionCountInput = document.getElementById('questionCountInput');
+        const generateButton = document.getElementById('generateButton');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const homePage = document.getElementById('homePage');
+        const learningAndQuizPage = document.getElementById('learningAndQuizPage');
+        const resultContainer = document.getElementById('resultContainer');
+        const learningContent = document.getElementById('learningContent');
+        const startQuizButton = document.getElementById('startQuizButton');
+        const getMoreInfoButton = document.getElementById('getMoreInfoButton');
+        const backButton = document.getElementById('backButton');
+        const quizBackButton = document.getElementById('quizBackButton');
+        const learningSection = document.getElementById('learningSection');
+        const quizSection = document.getElementById('quizSection');
+        const quizContent = document.getElementById('quizContent');
+        const quizScore = document.getElementById('quizScore');
+        const quizEndButtons = document.getElementById('quizEndButtons');
+        const errorContainer = document.getElementById('errorContainer');
+        const errorMessage = document.getElementById('errorMessage');
+        const messageBox = document.getElementById('messageBox');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const showAnswersButton = document.getElementById('showAnswersButton');
+
+        // IMPORTANT: The API key is handled by the environment and should remain an empty string.
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+        
+        let timerInterval;
+        let timeLeft;
+        let loadedQuizData = null;
+        let score = 0;
+        let currentQuestionIndex = 0;
+
+        // Function to manage page visibility
+        function showPage(page) {
+            homePage.classList.add('hidden');
+            learningAndQuizPage.classList.add('hidden');
+            if (page === 'homePage') {
+                homePage.classList.remove('hidden');
+            } else if (page === 'learningAndQuizPage') {
+                learningAndQuizPage.classList.remove('hidden');
+            }
+        }
+
+        // Function to show a temporary message to the user
+        function showMessage(text, isError = false) {
+            messageBox.textContent = text;
+            messageBox.style.backgroundColor = isError ? '#ef4444' : '#22c55e'; // red-500 or green-500
+            messageBox.classList.remove('opacity-0', '-translate-y-2');
+            messageBox.classList.add('opacity-100', 'translate-y-0');
+            setTimeout(() => {
+                messageBox.classList.remove('opacity-100', 'translate-y-0');
+                messageBox.classList.add('opacity-0', '-translate-y-2');
+            }, 3000);
+        }
+
+        // Function to handle the quiz answer selection
+        function checkAnswer(questionIndex, selectedOption) {
+            const questionElement = document.getElementById(`question-${questionIndex}`);
+            const options = questionElement.querySelectorAll('.quiz-option');
+            const data = JSON.parse(questionElement.dataset.question);
+            const correctAnswer = data.correctAnswer;
+            
+            // Check if a selection has already been made
+            if (questionElement.dataset.answered) {
+                return;
+            }
+            questionElement.dataset.answered = 'true';
+            
+            // Stop the timer for this question
+            clearInterval(timerInterval);
+
+            options.forEach(option => {
+                option.disabled = true;
+                if (option.textContent === correctAnswer) {
+                    option.classList.remove('hover:bg-gray-200', 'border-gray-300', 'text-gray-700');
+                    option.classList.add('bg-green-100', 'border-green-500', 'text-green-800', 'font-bold');
+                } else if (option.textContent === selectedOption) {
+                    option.classList.remove('hover:bg-gray-200', 'border-gray-300');
+                    option.classList.add('bg-red-100', 'border-red-500', 'text-red-800');
+                }
+            });
+
+            if (selectedOption === correctAnswer) {
+                score++;
+                showMessage("Correct! Great job!");
+            } else {
+                showMessage("Incorrect. The correct answer is highlighted.", true);
+            }
+
+            // Move to the next question after a short delay
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < loadedQuizData.quiz.length) {
+                    renderQuestion(currentQuestionIndex);
+                } else {
+                    endQuiz();
+                }
+            }, 1000);
+        }
+        
+        // Function to start the timer for the current question
+        function startQuestionTimer() {
+            timeLeft = 120; // 2 minutes per question
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    const questionElement = document.getElementById(`question-${currentQuestionIndex}`);
+                    if (questionElement) {
+                         const options = questionElement.querySelectorAll('.quiz-option');
+                         options.forEach(option => option.disabled = true);
+                         questionElement.dataset.answered = 'true';
+                         showMessage("Time's up for this question!", true);
+                         // Move to next question automatically
+                         setTimeout(() => {
+                            currentQuestionIndex++;
+                            if (currentQuestionIndex < loadedQuizData.quiz.length) {
+                                renderQuestion(currentQuestionIndex);
+                            } else {
+                                endQuiz();
+                            }
+                         }, 1000);
+                    }
+                }
+            }, 1000);
+        }
+
+        // Function to update the timer display
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+        
+        // Function to end the quiz when time runs out or all questions are answered
+        function endQuiz() {
+            clearInterval(timerInterval);
+            timerDisplay.textContent = "Quiz Finished!";
+            
+            const totalQuestions = loadedQuizData.quiz.length;
+            quizContent.innerHTML = '';
+            quizScore.textContent = `You scored ${score} out of ${totalQuestions}!`;
+            quizScore.className = `mt-6 p-4 rounded-lg text-center font-bold text-xl ${score >= totalQuestions / 2 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`;
+            quizScore.classList.remove('hidden');
+            quizEndButtons.classList.remove('hidden');
+            showAnswersButton.classList.remove('hidden');
+        }
+        
+        // Function to show correct answers
+        function showCorrectAnswers() {
+            quizContent.innerHTML = ''; // Clear previous quiz content
+            showAnswersButton.classList.add('hidden'); // Hide the button
+
+            loadedQuizData.quiz.forEach((question, index) => {
+                const qDiv = document.createElement('div');
+                qDiv.className = 'bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200';
+                
+                let optionsHtml = '';
+                question.options.forEach(option => {
+                    const isCorrect = option === question.correctAnswer;
+                    const optionClasses = isCorrect
+                        ? 'bg-green-100 border-green-500 text-green-800 font-bold'
+                        : 'bg-gray-100 border-gray-300 text-gray-700';
+
+                    optionsHtml += `
+                        <button class="w-full text-left p-3 border rounded-lg cursor-default ${optionClasses}" disabled>
+                            ${option}
+                        </button>
+                    `;
+                });
+
+                qDiv.innerHTML = `
+                    <p class="text-lg font-medium mb-4">${index + 1}. ${question.question}</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        ${optionsHtml}
+                    </div>
+                `;
+                quizContent.appendChild(qDiv);
+            });
+        }
+
+
+        // Function to render the learning content
+        function renderLearningContent(data) {
+            learningContent.innerHTML = `<h2 class="text-2xl font-bold mb-4">Learning Summary</h2><p class="text-gray-700">${data.explanation}</p>`;
+            startQuizButton.disabled = false;
+        }
+        
+        // Function to fetch more detailed explanation
+        async function getMoreInfo() {
+            const topic = topicInput.value.trim();
+            if (topic.length === 0) {
+                return;
+            }
+
+            loadingIndicator.classList.remove('hidden');
+            getMoreInfoButton.disabled = true;
+            startQuizButton.disabled = true;
+
+            const prompt = `Provide a significantly more detailed and in-depth explanation of the topic "${topic}". Break down complex concepts and use examples to make it easy for someone who didn't understand the first explanation. The response should be a single paragraph of text only.`;
+
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
+                    const newExplanation = result.candidates[0].content.parts[0].text;
+                    learningContent.innerHTML = `<h2 class="text-2xl font-bold mb-4">Detailed Explanation</h2><p class="text-gray-700">${newExplanation}</p>`;
+                    showMessage("Explanation updated!", false);
+                } else {
+                    throw new Error("Invalid response from API for more info.");
+                }
+            } catch (error) {
+                console.error("API call failed:", error);
+                showMessage("Failed to get more information. Please try again.", true);
+            } finally {
+                loadingIndicator.classList.add('hidden');
+                getMoreInfoButton.disabled = false;
+                startQuizButton.disabled = false;
+            }
+        }
+
+        // Function to render a single quiz question
+        function renderQuestion(index) {
+            if (index >= loadedQuizData.quiz.length) {
+                endQuiz();
+                return;
+            }
+            const question = loadedQuizData.quiz[index];
+            quizContent.innerHTML = '';
+            
+            const qDiv = document.createElement('div');
+            qDiv.id = `question-${index}`;
+            qDiv.dataset.question = JSON.stringify(question);
+            qDiv.className = 'bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200';
+            
+            let optionsHtml = '';
+            question.options.forEach(option => {
+                optionsHtml += `
+                    <button class="quiz-option w-full text-left p-3 border border-gray-300 rounded-lg transition-colors hover:bg-gray-200 text-gray-700" 
+                            onclick="checkAnswer(${index}, '${option}')">
+                        ${option}
+                    </button>
+                `;
+            });
+
+            qDiv.innerHTML = `
+                <p class="text-lg font-medium mb-4">${index + 1}. ${question.question}</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    ${optionsHtml}
+                </div>
+            `;
+            quizContent.appendChild(qDiv);
+            startQuestionTimer();
+        }
+        
+        // Function to start the quiz
+        function startQuiz() {
+            if (!loadedQuizData) return;
+            
+            learningSection.classList.add('hidden');
+            quizSection.classList.remove('hidden');
+            currentQuestionIndex = 0;
+            score = 0; // Reset score
+            renderQuestion(currentQuestionIndex);
+        }
+
+        // Function to handle the API call for both content and quiz
+        async function generateQuiz() {
+            const topic = topicInput.value.trim();
+            const questionCount = parseInt(questionCountInput.value, 10);
+
+            if (topic.length === 0) {
+                errorContainer.classList.remove('hidden');
+                errorMessage.textContent = "Please enter a topic to generate a quiz.";
+                return;
+            }
+
+            if (isNaN(questionCount) || questionCount <= 0) {
+                errorContainer.classList.remove('hidden');
+                errorMessage.textContent = "Please enter a valid number of questions (1 or more).";
+                return;
+            }
+
+            // Clear any previous timer and state
+            clearInterval(timerInterval);
+            loadedQuizData = null;
+
+            // Reset UI
+            errorContainer.classList.add('hidden');
+            loadingIndicator.classList.remove('hidden');
+            generateButton.disabled = true;
+
+            const prompt = `Based on the topic "${topic}", provide a detailed explanation and a multiple-choice quiz. The explanation should be a single paragraph. The quiz must have exactly ${questionCount} questions, with each question having 4 options. The response MUST be a single JSON object with the following structure:
+            
+            {
+                "explanation": "Your detailed explanation of the topic here.",
+                "quiz": [
+                    {
+                        "question": "Question 1 text here?",
+                        "options": ["Option A", "Option B", "Option C", "Option D"],
+                        "correctAnswer": "Correct option text here"
+                    },
+                    {
+                        "question": "Question 2 text here?",
+                        "options": ["Option A", "Option B", "Option C", "Option D"],
+                        "correctAnswer": "Correct option text here"
+                    }
+                ]
+            }
+            
+            Do not include any other text or formatting. The response must be a valid JSON object.`;
+
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            "explanation": { "type": "STRING" },
+                            "quiz": {
+                                "type": "ARRAY",
+                                "items": {
+                                    "type": "OBJECT",
+                                    "properties": {
+                                        "question": { "type": "STRING" },
+                                        "options": {
+                                            "type": "ARRAY",
+                                            "items": { "type": "STRING" }
+                                        },
+                                        "correctAnswer": { "type": "STRING" }
+                                    },
+                                    "propertyOrdering": ["question", "options", "correctAnswer"]
+                                }
+                            }
+                        },
+                        "propertyOrdering": ["explanation", "quiz"]
+                    }
+                }
+            };
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
+                    const jsonString = result.candidates[0].content.parts[0].text;
+                    const parsedData = JSON.parse(jsonString);
+                    loadedQuizData = parsedData;
+                    renderLearningContent(loadedQuizData);
+                    showPage('learningAndQuizPage');
+                } else {
+                    throw new Error("Invalid response from API.");
+                }
+
+            } catch (error) {
+                console.error("API call failed:", error);
+                errorContainer.classList.remove('hidden');
+                errorMessage.textContent = `An error occurred: ${error.message}. Please try again.`;
+            } finally {
+                loadingIndicator.classList.add('hidden');
+                generateButton.disabled = false;
+            }
+        }
+        
+        generateButton.addEventListener('click', generateQuiz);
+        startQuizButton.addEventListener('click', startQuiz);
+        getMoreInfoButton.addEventListener('click', getMoreInfo);
+        backButton.addEventListener('click', () => showPage('homePage'));
+        quizBackButton.addEventListener('click', () => showPage('homePage'));
+        showAnswersButton.addEventListener('click', showCorrectAnswers);
+    </script>
+</body>
+</html>
