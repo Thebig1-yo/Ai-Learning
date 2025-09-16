@@ -80,6 +80,9 @@
                     <div id="quizContent" class="space-y-6">
                         <!-- Quiz questions will be displayed here -->
                     </div>
+                    <button id="nextButton" class="hidden w-full bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 transition-colors mt-6">
+                        Next Question &rarr;
+                    </button>
                     <div id="quizScore" class="hidden mt-6 p-4 rounded-lg text-center font-bold text-xl"></div>
                     <div id="quizEndButtons" class="hidden flex flex-col sm:flex-row justify-center gap-4 mt-6">
                         <button id="showAnswersButton" class="bg-blue-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-blue-600 transition-colors">
@@ -121,6 +124,7 @@
         const messageBox = document.getElementById('messageBox');
         const timerDisplay = document.getElementById('timerDisplay');
         const showAnswersButton = document.getElementById('showAnswersButton');
+        const nextButton = document.getElementById('nextButton');
 
         // IMPORTANT: The API key is now set here based on your request.
         const apiKey = "AIzaSyD-Rdc07BhhYly5C2fz2fIpWtkNnJTWzdI";
@@ -196,15 +200,18 @@
             explanationDiv.innerHTML = `<p class="font-bold text-blue-800">Explanation:</p><p class="mt-1 text-gray-700">${explanation}</p>`;
             questionElement.appendChild(explanationDiv);
 
-            // Move to the next question after a short delay
-            setTimeout(() => {
-                currentQuestionIndex++;
-                if (currentQuestionIndex < loadedQuizData.quiz.length) {
-                    renderQuestion(currentQuestionIndex);
-                } else {
-                    endQuiz();
-                }
-            }, 3000);
+            nextButton.classList.remove('hidden');
+        }
+        
+        // Function to advance to the next question
+        function nextQuestion() {
+            currentQuestionIndex++;
+            nextButton.classList.add('hidden'); // Hide the button immediately
+            if (currentQuestionIndex < loadedQuizData.quiz.length) {
+                renderQuestion(currentQuestionIndex);
+            } else {
+                endQuiz();
+            }
         }
         
         // Function to start the timer for the current question
@@ -222,15 +229,7 @@
                          options.forEach(option => option.disabled = true);
                          questionElement.dataset.answered = 'true';
                          showMessage("Time's up for this question!", true);
-                         // Move to next question automatically
-                         setTimeout(() => {
-                            currentQuestionIndex++;
-                            if (currentQuestionIndex < loadedQuizData.quiz.length) {
-                                renderQuestion(currentQuestionIndex);
-                            } else {
-                                endQuiz();
-                            }
-                         }, 1000);
+                         nextButton.classList.remove('hidden');
                     }
                 }
             }, 1000);
@@ -261,6 +260,7 @@
         function showCorrectAnswers() {
             quizContent.innerHTML = ''; // Clear previous quiz content
             showAnswersButton.classList.add('hidden'); // Hide the button
+            nextButton.classList.add('hidden');
 
             loadedQuizData.quiz.forEach((question, index) => {
                 const qDiv = document.createElement('div');
@@ -513,6 +513,7 @@
         backButton.addEventListener('click', () => showPage('homePage'));
         quizBackButton.addEventListener('click', () => showPage('homePage'));
         showAnswersButton.addEventListener('click', showCorrectAnswers);
+        nextButton.addEventListener('click', nextQuestion);
     </script>
 </body>
 </html>
