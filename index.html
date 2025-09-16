@@ -277,6 +277,13 @@
             explanationDiv.innerHTML = `<p class="font-bold text-blue-800">Explanation:</p><p class="mt-1 text-gray-700">${explanation}</p>`;
             questionElement.appendChild(explanationDiv);
 
+            // Change button text for the final question
+            if (currentQuestionIndex === loadedQuizData.quiz.length - 1) {
+                nextButton.textContent = 'Check Result';
+            } else {
+                nextButton.textContent = 'Next Question →';
+            }
+            
             nextButton.classList.remove('hidden');
         }
         
@@ -853,4 +860,3 @@
     </script>
 </body>
 </html>
-
