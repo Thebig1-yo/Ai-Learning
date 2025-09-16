@@ -13,6 +13,17 @@
         .container {
             max-width: 800px;
         }
+        .chat-message.user {
+            background-color: #dbeafe; /* blue-100 */
+            border-radius: 1rem 1rem 0 1rem;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+        .chat-message.ai {
+            background-color: #f3f4f6; /* gray-100 */
+            border-radius: 1rem 1rem 1rem 0;
+            align-self: flex-start;
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800 flex items-center justify-center min-h-screen p-4 sm:p-6">
@@ -59,16 +70,39 @@
                     <div id="learningContent" class="bg-blue-50 p-6 rounded-lg border border-blue-200 mb-6">
                         <!-- Learning content will be displayed here -->
                     </div>
-                    <div class="flex flex-col sm:flex-row gap-4">
+                    <div class="flex flex-col sm:flex-row gap-4 mb-8">
                         <button id="getMoreInfoButton" class="flex-grow bg-blue-500 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-blue-600 transition-colors disabled:bg-gray-400">
                             Explain it more simply
                         </button>
                         <button id="getExamplesButton" class="flex-grow bg-blue-500 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-blue-600 transition-colors disabled:bg-gray-400">
                             Give me examples
                         </button>
-                        <button id="startQuizButton" class="flex-grow bg-blue-600 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-blue-700 transition-colors disabled:bg-gray-400">
+                        <button id="speakButton" class="flex-grow bg-purple-500 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-purple-600 transition-colors disabled:bg-gray-400">
+                            ✨ Speak Content
+                        </button>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                         <button id="startQuizButton" class="flex-grow bg-blue-600 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-blue-700 transition-colors disabled:bg-gray-400">
                             Start Quiz
                         </button>
+                    </div>
+                    
+                    <!-- Chat Section -->
+                    <div id="chatSection" class="mt-12 bg-gray-50 p-6 rounded-xl border border-gray-200">
+                        <h3 class="text-xl font-bold mb-4 text-center">Ask the AI Tutor</h3>
+                        <div id="chatMessages" class="flex flex-col gap-4 overflow-y-auto max-h-72 mb-4 p-2">
+                            <!-- Chat messages will appear here -->
+                        </div>
+                        <form id="chatForm" class="flex flex-col sm:flex-row gap-2">
+                            <input type="text" id="chatInput" placeholder="Ask a question..."
+                                class="flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+                            <button type="submit" id="chatSendButton" class="bg-blue-600 text-white py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 transition-colors disabled:bg-gray-400">
+                                Send ✨
+                            </button>
+                            <button type="button" id="clearChatButton" class="bg-red-500 text-white py-3 px-6 rounded-lg shadow-md hover:bg-red-600 transition-colors">
+                                Clear
+                            </button>
+                        </form>
                     </div>
                 </div>
     
@@ -129,16 +163,26 @@
         const timerDisplay = document.getElementById('timerDisplay');
         const showAnswersButton = document.getElementById('showAnswersButton');
         const nextButton = document.getElementById('nextButton');
+        const speakButton = document.getElementById('speakButton');
+        const chatSection = document.getElementById('chatSection');
+        const chatMessages = document.getElementById('chatMessages');
+        const chatForm = document.getElementById('chatForm');
+        const chatInput = document.getElementById('chatInput');
+        const chatSendButton = document.getElementById('chatSendButton');
+        const clearChatButton = document.getElementById('clearChatButton');
 
         // IMPORTANT: The API key is now set here based on your request.
-        const apiKey = "AIzaSyD-Rdc07BhhYly5C2fz2fIpWtkNnJTWzdI";
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+        const apiKey = "";
+        const textToTextApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+        const ttsApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
         
         let timerInterval;
         let timeLeft;
         let loadedQuizData = null;
         let score = 0;
         let currentQuestionIndex = 0;
+        let audioContext;
+        let chatHistory = [];
 
         // Function to handle retries with exponential backoff for API calls
         async function retryWithExponentialBackoff(callback, args, maxRetries = 5, delay = 1000) {
@@ -337,144 +381,6 @@
             learningContent.innerHTML = `<h2 class="text-2xl font-bold mb-4">Learning Summary</h2><p class="text-gray-700">${data.explanation}</p>`;
             startQuizButton.disabled = false;
         }
-        
-        // Function to fetch more detailed explanation
-        async function getMoreInfo() {
-            const topic = topicInput.value.trim();
-            if (topic.length === 0) {
-                return;
-            }
-
-            loadingIndicator.classList.remove('hidden');
-            getMoreInfoButton.disabled = true;
-            getExamplesButton.disabled = true;
-            startQuizButton.disabled = true;
-
-            const prompt = `Provide a significantly more detailed and in-depth explanation of the topic "${topic}". Use vocabulary and sentence structure appropriate for a middle school student. The response should be a single paragraph of text only.`;
-
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }],
-            };
-
-            try {
-                const response = await retryWithExponentialBackoff(fetch, [apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                }]);
-                
-                const result = await response.json();
-                
-                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
-                    const newExplanation = result.candidates[0].content.parts[0].text;
-                    learningContent.innerHTML = `<h2 class="text-2xl font-bold mb-4">Detailed Explanation</h2><p class="text-gray-700">${newExplanation}</p>`;
-                    showMessage("Explanation updated!", false);
-                } else {
-                    throw new Error("Invalid or empty response from the AI.");
-                }
-            } catch (error) {
-                console.error("API call failed:", error);
-                errorContainer.classList.remove('hidden');
-                errorMessage.textContent = `An error occurred: ${error.message}. Please try again.`;
-            } finally {
-                loadingIndicator.classList.add('hidden');
-                getMoreInfoButton.disabled = false;
-                getExamplesButton.disabled = false;
-                startQuizButton.disabled = false;
-            }
-        }
-
-        // Function to get examples for the topic
-        async function getExamples() {
-            const topic = topicInput.value.trim();
-            if (topic.length === 0) {
-                return;
-            }
-
-            loadingIndicator.classList.remove('hidden');
-            getMoreInfoButton.disabled = true;
-            getExamplesButton.disabled = true;
-            startQuizButton.disabled = true;
-
-            const prompt = `Provide three to five simple, real-world examples to help a student understand "${topic}". Use simple language and present them as a single, clear paragraph.`;
-
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }],
-            };
-            
-            try {
-                const response = await retryWithExponentialBackoff(fetch, [apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                }]);
-
-                const result = await response.json();
-                
-                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
-                    const examples = result.candidates[0].content.parts[0].text;
-                    learningContent.innerHTML = `<h2 class="text-2xl font-bold mb-4">Examples</h2><p class="text-gray-700">${examples}</p>`;
-                    showMessage("Examples loaded!", false);
-                } else {
-                    throw new Error("Invalid or empty response from the AI.");
-                }
-            } catch (error) {
-                console.error("API call failed:", error);
-                errorContainer.classList.remove('hidden');
-                errorMessage.textContent = `An error occurred: ${error.message}. Please try again.`;
-            } finally {
-                loadingIndicator.classList.add('hidden');
-                getMoreInfoButton.disabled = false;
-                getExamplesButton.disabled = false;
-                startQuizButton.disabled = false;
-            }
-        }
-
-
-        // Function to render a single quiz question
-        function renderQuestion(index) {
-            if (index >= loadedQuizData.quiz.length) {
-                endQuiz();
-                return;
-            }
-            const question = loadedQuizData.quiz[index];
-            quizContent.innerHTML = '';
-            
-            const qDiv = document.createElement('div');
-            qDiv.id = `question-${index}`;
-            qDiv.dataset.question = JSON.stringify(question);
-            qDiv.className = 'bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200';
-            
-            let optionsHtml = '';
-            question.options.forEach(option => {
-                optionsHtml += `
-                    <button class="quiz-option w-full text-left p-3 border border-gray-300 rounded-lg transition-colors hover:bg-gray-200 text-gray-700" 
-                            onclick="checkAnswer(${index}, '${option}')">
-                        ${option}
-                    </button>
-                `;
-            });
-
-            qDiv.innerHTML = `
-                <p class="text-lg font-medium mb-4">${index + 1}. ${question.question}</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    ${optionsHtml}
-                </div>
-            `;
-            quizContent.appendChild(qDiv);
-            startQuestionTimer();
-        }
-        
-        // Function to start the quiz
-        function startQuiz() {
-            if (!loadedQuizData) return;
-            
-            learningSection.classList.add('hidden');
-            quizSection.classList.remove('hidden');
-            currentQuestionIndex = 0;
-            score = 0; // Reset score
-            renderQuestion(currentQuestionIndex);
-        }
 
         // Function to handle the API call for both content and quiz
         async function generateQuiz() {
@@ -496,7 +402,9 @@
             // Clear any previous timer and state
             clearInterval(timerInterval);
             loadedQuizData = null;
-
+            chatHistory = [];
+            chatMessages.innerHTML = '';
+            
             // Reset UI
             errorContainer.classList.add('hidden');
             loadingIndicator.classList.remove('hidden');
@@ -550,7 +458,7 @@
             };
             
             try {
-                const response = await retryWithExponentialBackoff(fetch, [apiUrl, {
+                const response = await retryWithExponentialBackoff(fetch, [textToTextApiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -578,6 +486,319 @@
             }
         }
         
+        // Function to fetch more detailed explanation
+        async function getMoreInfo() {
+            const topic = topicInput.value.trim();
+            if (topic.length === 0) {
+                return;
+            }
+
+            loadingIndicator.classList.remove('hidden');
+            getMoreInfoButton.disabled = true;
+            getExamplesButton.disabled = true;
+            startQuizButton.disabled = true;
+
+            const prompt = `Provide a significantly more detailed and in-depth explanation of the topic "${topic}". Use vocabulary and sentence structure appropriate for a middle school student. The response should be a single paragraph of text only.`;
+
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+            };
+
+            try {
+                const response = await retryWithExponentialBackoff(fetch, [textToTextApiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }]);
+                
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
+                    const newExplanation = result.candidates[0].content.parts[0].text;
+                    learningContent.innerHTML = `<h2 class="text-2xl font-bold mb-4">Detailed Explanation</h2><p class="text-gray-700">${newExplanation}</p>`;
+                    showMessage("Explanation updated!", false);
+                } else {
+                    throw new Error("Invalid or empty response from the AI.");
+                }
+            } catch (error) {
+                console.error("API call failed:", error);
+                errorContainer.classList.remove('hidden');
+                errorMessage.textContent = `An error occurred: ${error.message}. Please try again.`;
+            } finally {
+                loadingIndicator.classList.add('hidden');
+                getMoreInfoButton.disabled = false;
+                getExamplesButton.disabled = false;
+                startQuizButton.disabled = false;
+            }
+        }
+
+        // Function to get examples for the topic
+        async function getExamples() {
+            const topic = topicInput.value.trim();
+            if (topic.length === 0) {
+                return;
+            }
+
+            loadingIndicator.classList.remove('hidden');
+            getMoreInfoButton.disabled = true;
+            getExamplesButton.disabled = true;
+            startQuizButton.disabled = true;
+
+            const prompt = `Provide three to five simple, real-world examples to help a student understand "${topic}". Use simple language and present them as a single, clear paragraph.`;
+
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+            };
+            
+            try {
+                const response = await retryWithExponentialBackoff(fetch, [textToTextApiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }]);
+
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
+                    const examples = result.candidates[0].content.parts[0].text;
+                    learningContent.innerHTML = `<h2 class="text-2xl font-bold mb-4">Examples</h2><p class="text-gray-700">${examples}</p>`;
+                    showMessage("Examples loaded!", false);
+                } else {
+                    throw new Error("Invalid or empty response from the AI.");
+                }
+            } catch (error) {
+                console.error("API call failed:", error);
+                errorContainer.classList.remove('hidden');
+                errorMessage.textContent = `An error occurred: ${error.message}. Please try again.`;
+            } finally {
+                loadingIndicator.classList.add('hidden');
+                getMoreInfoButton.disabled = false;
+                getExamplesButton.disabled = false;
+                startQuizButton.disabled = false;
+            }
+        }
+
+        // Function to handle the chat input
+        async function handleChat(event) {
+            event.preventDefault();
+            const userMessage = chatInput.value.trim();
+            if (!userMessage) return;
+
+            // Display user message
+            appendMessage(userMessage, 'user');
+            chatInput.value = '';
+            chatSendButton.disabled = true;
+
+            // Build payload with context and chat history
+            const prompt = `You are a helpful and patient tutor for a middle school student. The current topic of study is "${topicInput.value.trim()}". Answer the student's question concisely and in a way that is easy to understand.`;
+
+            chatHistory.push({ role: 'user', parts: [{ text: userMessage }] });
+
+            const payload = {
+                contents: chatHistory,
+                systemInstruction: { parts: [{ text: prompt }] },
+            };
+
+            try {
+                const response = await retryWithExponentialBackoff(fetch, [textToTextApiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }]);
+
+                const result = await response.json();
+                const aiResponseText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (aiResponseText) {
+                    appendMessage(aiResponseText, 'ai');
+                    chatHistory.push({ role: 'model', parts: [{ text: aiResponseText }] });
+                } else {
+                    appendMessage("Sorry, I couldn't get a response. Please try again.", 'ai');
+                }
+            } catch (error) {
+                console.error("Chat API call failed:", error);
+                appendMessage("Sorry, there was an error communicating with the AI. Please try again.", 'ai');
+            } finally {
+                chatSendButton.disabled = false;
+            }
+        }
+
+        function appendMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message p-3 rounded-lg max-w-[85%]`;
+            messageDiv.classList.add(sender);
+            messageDiv.textContent = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll to the bottom
+        }
+
+        function clearChat() {
+            chatHistory = [];
+            chatMessages.innerHTML = '';
+            showMessage("Chat cleared!");
+        }
+
+        // Function to render a single quiz question
+        function renderQuestion(index) {
+            if (index >= loadedQuizData.quiz.length) {
+                endQuiz();
+                return;
+            }
+            const question = loadedQuizData.quiz[index];
+            quizContent.innerHTML = '';
+            
+            const qDiv = document.createElement('div');
+            qDiv.id = `question-${index}`;
+            qDiv.dataset.question = JSON.stringify(question);
+            qDiv.className = 'bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200';
+            
+            let optionsHtml = '';
+            question.options.forEach(option => {
+                optionsHtml += `
+                    <button class="quiz-option w-full text-left p-3 border border-gray-300 rounded-lg transition-colors hover:bg-gray-200 text-gray-700" 
+                            onclick="checkAnswer(${index}, '${option}')">
+                        ${option}
+                    </button>
+                `;
+            });
+
+            qDiv.innerHTML = `
+                <p class="text-lg font-medium mb-4">${index + 1}. ${question.question}</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    ${optionsHtml}
+                </div>
+            `;
+            quizContent.appendChild(qDiv);
+            startQuestionTimer();
+        }
+        
+        // Function to start the quiz
+        function startQuiz() {
+            if (!loadedQuizData) return;
+            
+            learningSection.classList.add('hidden');
+            quizSection.classList.remove('hidden');
+            currentQuestionIndex = 0;
+            score = 0; // Reset score
+            renderQuestion(currentQuestionIndex);
+        }
+
+        // Function to play text from the content area
+        async function speakContent() {
+            const textToSpeak = learningContent.textContent;
+            if (textToSpeak.length === 0) {
+                showMessage("There is no content to speak.", true);
+                return;
+            }
+            
+            speakButton.disabled = true;
+            speakButton.textContent = "Loading Audio...";
+
+            const payload = {
+                contents: [{ parts: [{ text: textToSpeak }] }],
+                generationConfig: {
+                    responseModalities: ["AUDIO"],
+                    speechConfig: {
+                        voiceConfig: {
+                            prebuiltVoiceConfig: { voiceName: "Puck" }
+                        }
+                    }
+                },
+                model: "gemini-2.5-flash-preview-tts"
+            };
+            
+            try {
+                const response = await retryWithExponentialBackoff(fetch, [ttsApiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }]);
+                
+                const result = await response.json();
+                const part = result?.candidates?.[0]?.content?.parts?.[0];
+                const audioData = part?.inlineData?.data;
+                const mimeType = part?.inlineData?.mimeType;
+
+                if (audioData && mimeType && mimeType.startsWith("audio/")) {
+                    const sampleRate = parseInt(mimeType.match(/rate=(\d+)/)[1], 10);
+                    const pcmData = base64ToArrayBuffer(audioData);
+                    const pcm16 = new Int16Array(pcmData);
+                    const wavBlob = pcmToWav(pcm16, sampleRate);
+                    const audioUrl = URL.createObjectURL(wavBlob);
+
+                    const audio = new Audio(audioUrl);
+                    audio.play();
+                    audio.onended = () => {
+                        URL.revokeObjectURL(audioUrl);
+                        speakButton.disabled = false;
+                        speakButton.textContent = "✨ Speak Content";
+                    };
+                } else {
+                    throw new Error("Invalid audio response from API.");
+                }
+            } catch (error) {
+                console.error("TTS API call failed:", error);
+                showMessage("Failed to generate speech. Please try again.", true);
+                speakButton.disabled = false;
+                speakButton.textContent = "✨ Speak Content";
+            }
+        }
+
+        // Helper function to convert base64 to ArrayBuffer
+        function base64ToArrayBuffer(base64) {
+            const binaryString = atob(base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        // Helper function to convert PCM to WAV format
+        function pcmToWav(pcmData, sampleRate) {
+            const numChannels = 1;
+            const bytesPerSample = 2;
+            const blockAlign = numChannels * bytesPerSample;
+            const byteRate = sampleRate * blockAlign;
+            const dataSize = pcmData.byteLength;
+            const buffer = new ArrayBuffer(44 + dataSize);
+            const view = new DataView(buffer);
+
+            // RIFF chunk descriptor
+            writeString(view, 0, 'RIFF');
+            view.setUint32(4, 36 + dataSize, true);
+            writeString(view, 8, 'WAVE');
+
+            // fmt sub-chunk
+            writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, numChannels, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, byteRate, true);
+            view.setUint16(32, blockAlign, true);
+            view.setUint16(34, bytesPerSample * 8, true);
+
+            // data sub-chunk
+            writeString(view, 36, 'data');
+            view.setUint32(40, dataSize, true);
+
+            // Write PCM data
+            const pcmView = new Int16Array(buffer, 44, pcmData.length);
+            for (let i = 0; i < pcmData.length; i++) {
+                pcmView[i] = pcmData[i];
+            }
+
+            return new Blob([view], { type: 'audio/wav' });
+        }
+
+        function writeString(view, offset, string) {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        }
+        
         generateButton.addEventListener('click', generateQuiz);
         startQuizButton.addEventListener('click', startQuiz);
         getMoreInfoButton.addEventListener('click', getMoreInfo);
@@ -586,6 +807,9 @@
         quizBackButton.addEventListener('click', () => showPage('homePage'));
         showAnswersButton.addEventListener('click', showCorrectAnswers);
         nextButton.addEventListener('click', nextQuestion);
+        speakButton.addEventListener('click', speakContent);
+        chatForm.addEventListener('submit', handleChat);
+        clearChatButton.addEventListener('click', clearChat);
     </script>
 </body>
 </html>
