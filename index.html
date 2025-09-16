@@ -178,7 +178,7 @@
         const chatSendButton = document.getElementById('chatSendButton');
         const clearChatButton = document.getElementById('clearChatButton');
         
-        const apiKey = "AIzaSyD0iha7rSHd6RGsNTyg_8uhfSuJ3pocU3s";
+        const apiKey = ""; // <-- PASTE YOUR API KEY HERE
         const textToTextApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
         const ttsApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
         
@@ -193,8 +193,8 @@
 
         // Function to handle retries with exponential backoff for API calls
         async function retryWithExponentialBackoff(callback, args, maxRetries = 5, delay = 1000) {
-            if (!apiKey || apiKey === "AIzaSyD0iha7rSHd6RGsNTyg_8uhfSuJ3pocU3s") {
-                const errorMsg = "API Key is missing or invalid. Please add your key to the 'apiKey' variable in the code.";
+            if (!apiKey) {
+                const errorMsg = "AIzaSyB9Ua1nULkrfB25v1rmWqCGJDpamt7jthI";
                 console.error(errorMsg);
                 throw new Error(errorMsg);
             }
